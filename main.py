@@ -95,7 +95,6 @@ async def update_loop():
                 rounded = round(price, 2)
                 last_price = last_prices.get(name)
 
-                # Preisvergleich mit Toleranz
                 if last_price is not None and abs(rounded - last_price) < 0.10:
                     print(f"⏸ {name}: Änderung ({rounded}) < 0.10 → kein Update.")
                     continue
@@ -106,15 +105,17 @@ async def update_loop():
                 channel = client.get_channel(config["channel_id"])
 
                 if channel:
+                    print(f"📢 Ändere Kanal-ID {channel.id} → {new_name}")
                     await channel.edit(name=new_name)
-                    print(f"✅ Aktualisiert: {new_name}")
+                    print(f"✅ Kanal aktualisiert: {new_name}")
                 else:
-                    print(f"❌ Channel {config['channel_id']} nicht gefunden")
+                    print(f"❌ Channel-ID {config['channel_id']} für {name} nicht gefunden")
 
             except Exception as e:
                 print(f"❌ Fehler bei {name}: {e}")
 
-        await asyncio.sleep(30)
+        await asyncio.sleep(300)  # 5 Minuten
+        
 
 try:
     client.run(TOKEN)
