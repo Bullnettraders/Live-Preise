@@ -93,10 +93,11 @@ async def update_loop():
                 )
 
                 rounded = round(price, 2)
+                last_price = last_prices.get(name)
 
-                # Preis vergleichen – nur updaten wenn sich etwas geändert hat
-                if last_prices.get(name) == rounded:
-                    print(f"⏸ {name}: Preis unverändert ({rounded}), kein Update nötig.")
+                # Preisvergleich mit Toleranz
+                if last_price is not None and abs(rounded - last_price) < 0.10:
+                    print(f"⏸ {name}: Änderung ({rounded}) < 0.10 → kein Update.")
                     continue
 
                 last_prices[name] = rounded
