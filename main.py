@@ -29,10 +29,10 @@ SYMBOLS = {
         "binance_symbol": "BTCUSDT",
         "channel_id": check_channel("CHANNEL_BTC")
     },
-    "GOLD": {
+    "ETH": {
         "source": "binance",
-        "binance_symbol": "XAUUSDT",
-        "channel_id": check_channel("CHANNEL_GOLD")
+        "binance_symbol": "ETHUSDT",
+        "channel_id": check_channel("CHANNEL_ETH")
     },
     "DAX": {
         "source": "yahoo",
@@ -53,13 +53,23 @@ def get_binance_price(symbol):
     print(f"🔄 Hole Binance-Preis für {symbol}")
     url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
     response = requests.get(url).json()
+    if "price" not in response:
+        raise Exception(f"Keine Preis-Daten für {symbol}")
     return float(response["price"])
 
 def get_yahoo_price(symbol):
     print(f"🔄 Hole Yahoo-Preis für {symbol}")
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1m"
-    response = requests.get(url).json()
-    result = response["chart"]["result"][0]
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        raise Exception(f"HTTP {response.status_code} – {response.text[:100]}")
+
+    data = response.json()
+    result = data["chart"]["result"][0]
     return result["meta"]["regularMarketPrice"]
 
 @client.event
