@@ -2,34 +2,47 @@ import discord
 import requests
 import asyncio
 import os
+import sys
 
 print("📦 Starte Bot...")
 
+# ENV prüfen
 TOKEN = os.getenv("DISCORD_TOKEN")
 if not TOKEN:
-    print("❌ DISCORD_TOKEN fehlt!")
-    exit(1)
+    print("❌ Umgebungsvariable DISCORD_TOKEN fehlt!")
+    sys.exit(1)
+
+def check_channel(varname):
+    val = os.getenv(varname)
+    if not val:
+        print(f"❌ Umgebungsvariable {varname} fehlt!")
+        sys.exit(1)
+    try:
+        return int(val)
+    except ValueError:
+        print(f"❌ Umgebungsvariable {varname} ist keine gültige Channel-ID!")
+        sys.exit(1)
 
 SYMBOLS = {
     "BTC": {
         "source": "binance",
         "binance_symbol": "BTCUSDT",
-        "channel_id": int(os.getenv("CHANNEL_BTC", 0))
+        "channel_id": check_channel("CHANNEL_BTC")
     },
     "GOLD": {
         "source": "binance",
         "binance_symbol": "XAUUSDT",
-        "channel_id": int(os.getenv("CHANNEL_GOLD", 0))
+        "channel_id": check_channel("CHANNEL_GOLD")
     },
     "DAX": {
         "source": "yahoo",
         "yahoo_symbol": "^GDAXI",
-        "channel_id": int(os.getenv("CHANNEL_DAX", 0))
+        "channel_id": check_channel("CHANNEL_DAX")
     },
     "NASDAQ": {
         "source": "yahoo",
         "yahoo_symbol": "^IXIC",
-        "channel_id": int(os.getenv("CHANNEL_NASDAQ", 0))
+        "channel_id": check_channel("CHANNEL_NASDAQ")
     },
 }
 
@@ -60,28 +73,27 @@ async def update_loop():
     while not client.is_closed():
         for name, config in SYMBOLS.items():
             try:
-                channel_id = config["channel_id"]
-                if not channel_id:
-                    print(f"⚠️ Keine Channel-ID für {name}, überspringe...")
-                    continue
+                price = (
+                    get_binance_price(config["binance_symbol"])
+                    if config["source"] == "binance"
+                    else get_yahoo_price(config["yahoo_symbol"])
+                )
 
-                if config["source"] == "binance":
-                    price = get_binance_price(config["binance_symbol"])
-                elif config["source"] == "yahoo":
-                    price = get_yahoo_price(config["yahoo_symbol"])
-                else:
-                    continue
-
-                channel = client.get_channel(channel_id)
+                channel = client.get_channel(config["channel_id"])
                 if channel:
                     formatted = f"{price:,.2f}"
                     new_name = f"📈 {name}: {formatted} $"
                     await channel.edit(name=new_name)
                     print(f"✅ Aktualisiert: {new_name}")
                 else:
-                    print(f"❌ Channel {channel_id} nicht gefunden")
+                    print(f"❌ Channel {config['channel_id']} nicht gefunden")
 
             except Exception as e:
                 print(f"❌ Fehler bei {name}: {e}")
 
         await asyncio.sleep(30)
+
+try:
+    client.run(TOKEN)
+except Exception as e:
+    print(f"❌ Discord-Login fehlgeschlagen: {e}")
