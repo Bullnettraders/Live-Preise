@@ -3,10 +3,8 @@ import requests
 import asyncio
 import os
 
-# Lade Discord-Token
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-# Symbolkonfiguration: Name → Quelle + Symbol + Voice Channel ID
 SYMBOLS = {
     "BTC": {
         "source": "binance",
@@ -33,13 +31,11 @@ SYMBOLS = {
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
-# Binance Preis holen
 def get_binance_price(symbol):
     url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
     response = requests.get(url).json()
     return float(response["price"])
 
-# Yahoo Finance Preis holen
 def get_yahoo_price(symbol):
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1m"
     response = requests.get(url).json()
@@ -53,6 +49,7 @@ async def on_ready():
 
 async def update_loop():
     await client.wait_until_ready()
+    print("🔁 Starte Update-Loop")
     while not client.is_closed():
         for name, config in SYMBOLS.items():
             try:
@@ -65,9 +62,8 @@ async def update_loop():
 
                 channel = client.get_channel(config["channel_id"])
                 if channel:
-                    emoji = "📈"
                     formatted = f"{price:,.2f}"
-                    new_name = f"{emoji} {name}: {formatted} $"
+                    new_name = f"📈 {name}: {formatted} $"
                     await channel.edit(name=new_name)
                     print(f"Aktualisiert: {new_name}")
                 else:
@@ -76,4 +72,4 @@ async def update_loop():
             except Exception as e:
                 print(f"Fehler bei {name}: {e}")
 
-        await asyncio.sleep(30)  # alle 30 Sekunden
+        await asyncio.sleep(30)
