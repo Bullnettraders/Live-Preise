@@ -30,10 +30,11 @@ SYMBOLS = {
         "channel_id": check_channel("CHANNEL_BTC")
     },
     "GOLD": {
-        "source": "yahoo",
-        "yahoo_symbol": "XAUUSD=X",
-        "channel_id": check_channel("CHANNEL_GOLD")
-    },
+    "source": "yahoo",
+    "yahoo_symbol": "GC=F",  # statt "XAUUSD=X"
+    "channel_id": check_channel("CHANNEL_GOLD")
+}
+
     "DAX": {
         "source": "yahoo",
         "yahoo_symbol": "^GDAXI",
