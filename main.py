@@ -29,10 +29,10 @@ SYMBOLS = {
         "binance_symbol": "BTCUSDT",
         "channel_id": check_channel("CHANNEL_BTC")
     },
-    "ETH": {
-        "source": "binance",
-        "binance_symbol": "ETHUSDT",
-        "channel_id": check_channel("CHANNEL_ETH")
+    "GOLD": {
+        "source": "yahoo",
+        "yahoo_symbol": "XAUUSD=X",
+        "channel_id": check_channel("CHANNEL_GOLD")
     },
     "DAX": {
         "source": "yahoo",
