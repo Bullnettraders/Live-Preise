@@ -80,6 +80,9 @@ async def on_ready():
 async def update_loop():
     await client.wait_until_ready()
     print("🔁 Starte Update-Loop")
+
+    last_prices = {}
+
     while not client.is_closed():
         for name, config in SYMBOLS.items():
             try:
@@ -89,10 +92,19 @@ async def update_loop():
                     else get_yahoo_price(config["yahoo_symbol"])
                 )
 
+                rounded = round(price, 2)
+
+                # Preis vergleichen – nur updaten wenn sich etwas geändert hat
+                if last_prices.get(name) == rounded:
+                    print(f"⏸ {name}: Preis unverändert ({rounded}), kein Update nötig.")
+                    continue
+
+                last_prices[name] = rounded
+                formatted = f"{rounded:,.2f}"
+                new_name = f"📈 {name}: {formatted} $"
                 channel = client.get_channel(config["channel_id"])
+
                 if channel:
-                    formatted = f"{price:,.2f}"
-                    new_name = f"📈 {name}: {formatted} $"
                     await channel.edit(name=new_name)
                     print(f"✅ Aktualisiert: {new_name}")
                 else:
