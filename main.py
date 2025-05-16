@@ -123,7 +123,7 @@ async def update_loop():
             except Exception as e:
                 print(f"❌ Fehler bei {name}: {e}")
 
-        await asyncio.sleep(300)  # 5 Minuten Pause
+        await asyncio.sleep(60)  # 1 Minuten Pause
         
 
 try:
