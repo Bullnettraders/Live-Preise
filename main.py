@@ -97,10 +97,17 @@ async def update_loop():
                     print(f"⏸ {name}: keine signifikante Änderung ({rounded})")
                     continue
 
-                arrow = "🔼" if last_price is not None and rounded > last_price else "🔽"
+                # Farbkodierter Kreis
+                if last_price is not None and rounded > last_price:
+                    icon = "🟢"
+                elif last_price is not None and rounded < last_price:
+                    icon = "🔴"
+                else:
+                    icon = "⚪"
+
                 percent_str = f"{change_percent:+.2f}%"
                 formatted = f"{rounded:,.2f}"
-                new_name = f"{arrow} {name}: {formatted} $ ({percent_str})"
+                new_name = f"{icon} {name}: {formatted} $ ({percent_str})"
 
                 channel = client.get_channel(config["channel_id"])
                 if channel:
@@ -112,7 +119,7 @@ async def update_loop():
             except Exception as e:
                 print(f"❌ Fehler bei {name}: {e}")
 
-        await asyncio.sleep(300)  # 5 Minuten
+        await asyncio.sleep(300)  # 5 Minuten Pause
         
 
 try:
