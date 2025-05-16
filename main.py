@@ -30,7 +30,7 @@ SYMBOLS = {
     },
     "GOLD": {
         "source": "yahoo",
-        "yahoo_symbol": "GC=F",
+        "yahoo_symbol": "GC=F",  # Gold Futures
         "channel_id": check_channel("CHANNEL_GOLD")
     },
     "DAX": {
@@ -40,7 +40,7 @@ SYMBOLS = {
     },
     "NASDAQ": {
         "source": "yahoo",
-        "yahoo_symbol": "^IXIC",
+        "yahoo_symbol": "^NDX",  # ✅ NASDAQ 100 wie gewünscht
         "channel_id": check_channel("CHANNEL_NASDAQ")
     },
 }
@@ -97,7 +97,7 @@ async def update_loop():
                     print(f"⏸ {name}: keine signifikante Änderung ({rounded})")
                     continue
 
-                # Farbkodierter Kreis
+                # Kreisfarbe je nach Entwicklung
                 if last_price is not None and rounded > last_price:
                     icon = "🟢"
                 elif last_price is not None and rounded < last_price:
@@ -119,7 +119,7 @@ async def update_loop():
             except Exception as e:
                 print(f"❌ Fehler bei {name}: {e}")
 
-        await asyncio.sleep(300)  # 5 Minuten Pause
+        await asyncio.sleep(300)  # 5 Minuten
         
 
 try:
